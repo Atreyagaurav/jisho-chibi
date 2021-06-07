@@ -1,0 +1,26 @@
+* Jisho Chibi
+** Introduction
+   This is a minimalistic GUI for jisho searches. It currently can only do a basic word search in the jisho as the API for the jisho only allows that.
+
+   This app is based on the Jisho API provided in this [[https://jisho.org/forum/54fefc1f6e73340b1f160000-is-there-any-kind-of-search-api][forum post]].
+
+   The GUI is a qt web engine, but instead of browsing the jisho website, it makes a small html in the following format to show the meanings.
+
+   #+begin_src html
+   <p> JP-WORD (JP-FURIGANA)</p>
+   <small><ol>
+       <li> en-meanings </li>
+   </ol></small>
+   #+end_src
+
+   The en-meanings part can contain multiple meanings, and for multiple entries (search results), you can use the buttons on the top to navigate.
+
+** Screenshots
+   Screenshot in context (using it while translating.)
+   
+   [[./screenshot-1.png]]
+
+   Main Jisho-Chibi UI
+   
+   [[./screenshot-2.png]]
+   

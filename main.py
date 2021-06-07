@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from mainWindow import Ui_MainWindow
 
 import requests
@@ -39,29 +41,32 @@ class myWindow(QtWidgets.QMainWindow):
     def search(self):
         self.term = self.ui.txtClip.text()
         self.statusBar().showMessage(f'Searching: {self.term}')
+        self.update()
         self.meanings = get_meanings_block(self.term)
         self.position = 0
-        self.update()
+        self.update_word()
 
     def next(self):
         self.position = (self.position + 1) % len(self.meanings)
-        self.update()
+        self.update_word()
         
     def prev(self):
         self.position = (self.position - 1) % len(self.meanings)
-        self.update()
+        self.update_word()
 
-    def update(self):
+    def update_word(self):
+        if not self.term:
+            return
         try:
             wrd = self.meanings[self.position]["japanese"][0]
             self.statusBar().showMessage(f'{self.position+1} of {len(self.meanings)} meaning(s)')
             html = f'<p>{wrd.get("word")} ({wrd.get("reading")})</p>'
             senses = self.meanings[self.position]["senses"]
-            meanings = [";".join(sen["english_definitions"]) for sen in senses]
-            html += '<ol>'
+            meanings = ["; ".join(sen["english_definitions"]) for sen in senses]
+            html += '<small><ol>'
             for m in meanings:
                 html += f'<li>{m}</li>'
-            html += '</ol>'
+            html += '</ol></small>'
             self.ui.webEngineView.setHtml(html)
         except KeyError:
             self.ui.webEngineView.setHtml('Error')
