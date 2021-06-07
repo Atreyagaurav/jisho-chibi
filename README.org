@@ -18,9 +18,17 @@
 ** Screenshots
    Screenshot in context (using it while translating.)
    
-   [[./screenshot-1.png]]
+   [[./screenshots/screenshot-1.png]]
 
    Main Jisho-Chibi UI
    
-   [[./screenshot-2.png]]
+   [[./screenshots/screenshot-2.png]]
+
+   Other Screenshots
+   
+   [[./screenshots/screenshot-3.png]]
+   
+   [[./screenshots/screenshot-4.png]]
+   
+   [[./screenshots/screenshot-5.png]]
    
