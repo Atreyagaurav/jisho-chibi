@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from PyQt5 import QtWidgets, QtCore, QtGui
 from mainWindow import Ui_MainWindow
 
 import requests
@@ -7,13 +8,11 @@ import pyperclip as pc
 
 _, paste = pc.determine_clipboard()
 
+
 def get_meanings_block(term):
     url = f'https://jisho.org/api/v1/search/words?keyword={term}'
     r = requests.get(url)
     return r.json()['data']
-
-
-from PyQt5 import QtWidgets, QtCore, QtGui
 
 
 class myWindow(QtWidgets.QMainWindow):
@@ -23,6 +22,9 @@ class myWindow(QtWidgets.QMainWindow):
         # self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.webEngineView.setHtml('<small><p>Jisho Chibi GUI for jisho API.</p>' +
+                                      'Visit <a href="https://jisho.org/">jisho page</a> for full dictionary use. <br \>'
+                                      'For more info on this app visit <a href="https://github.com/atreyagaurav/jisho-chibi">github</a>.</small>')
         self.connect_functions()
         self.term = ''
 
@@ -33,7 +35,11 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolSync.clicked.connect(self.auto_mode)
 
     def auto_mode(self):
-        term = paste(primary=True)
+        try:
+            term = paste(primary=True)
+        except TypeError:
+            # In  case there is no primary clipboard
+            term = paste()
         print(f'searching: {term}')
         self.ui.txtClip.setText(term)
         self.search()
@@ -42,9 +48,14 @@ class myWindow(QtWidgets.QMainWindow):
         self.term = self.ui.txtClip.text()
         self.statusBar().showMessage(f'Searching: {self.term}')
         self.update()
-        self.meanings = get_meanings_block(self.term)
-        self.position = 0
-        self.update_word()
+        try:
+            self.meanings = get_meanings_block(self.term)
+            self.position = 0
+            self.update_word()
+        except requests.exceptions.ConnectionError as e:
+            self.ui.webEngineView.setHtml(f'Connection Error: {e}')
+        except requests.exceptions.ConnectTimeout as e:
+            self.ui.webEngineView.setHtml(f'Connection Timeout: {e}')
 
     def next(self):
         self.position = (self.position + 1) % len(self.meanings)
@@ -68,8 +79,8 @@ class myWindow(QtWidgets.QMainWindow):
                 html += f'<li>{m}</li>'
             html += '</ol></small>'
             self.ui.webEngineView.setHtml(html)
-        except KeyError:
-            self.ui.webEngineView.setHtml('Error')
+        except (KeyError, IndexError) as e:
+            self.ui.webEngineView.setHtml(f'API error: {e}')
 
 
 def main():
