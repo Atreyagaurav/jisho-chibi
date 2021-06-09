@@ -19,11 +19,14 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QToolButton" name="toolSync">
+        <property name="toolTip">
+         <string>Sync with Selection/Clipboard</string>
+        </property>
         <property name="text">
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/icons.qrc">
+         <iconset resource="../icons/icons.qrc">
           <normaloff>:/icons/auto.png</normaloff>:/icons/auto.png</iconset>
         </property>
        </widget>
@@ -33,17 +36,23 @@
       </item>
       <item>
        <widget class="QPushButton" name="btnSearch">
+        <property name="statusTip">
+         <string>Search from Textbar</string>
+        </property>
         <property name="text">
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/icons.qrc">
+         <iconset resource="../icons/icons.qrc">
           <normaloff>:/icons/search.png</normaloff>:/icons/search.png</iconset>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnPrev">
+        <property name="statusTip">
+         <string>Previous Definition</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -55,6 +64,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="btnNext">
+        <property name="statusTip">
+         <string>Next Definition</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -103,7 +115,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/icons.qrc"/>
+  <include location="../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
