@@ -17,3 +17,9 @@ def get_meanings_html(word):
         template = Template(r.read())
     return template.render(word=word, csspath=csspath)
     
+
+def get_error_html(err_title, err_msg):
+    with open(resource("./templates/errors.htm"), "r") as r:
+        template = Template(r.read())
+    return template.render(err_title=err_title, err_msg=err_msg, csspath=csspath)
+    

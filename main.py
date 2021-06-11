@@ -28,6 +28,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.ui.webEngineView.setHtml(templates.get_intro_html())
         self.connect_functions()
+        self.primary = True
         self.term = ''
         self.meanings = []
         self.position = -1
@@ -53,6 +54,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.actionClearSearchHistory.triggered.connect(self.clear_history)
         self.ui.actionGithub.triggered.connect(self.visit_github)
         self.ui.actionSearchInJishoWeb.triggered.connect(self.search_web)
+        self.ui.actionPrimarySelection.triggered.connect(self._clipboard)
         self.ui.actionExit.triggered.connect(self.exit)
         # keys
         self.ui.toolSync.setShortcut(
@@ -76,19 +78,29 @@ class myWindow(QtWidgets.QMainWindow):
     def exit(self):
         self.app.exit(0)
 
-    def auto_mode(self):
+    def _clipboard(self):
+        self.primary = self.ui.actionPrimarySelection.isChecked()
+
+    def get_clipboard(self):
+        if not self.primary:
+            return paste()
+        
         # to avoid asking the primary selection for itself and being
         # unable to get it from X since it is busy waiting inside this
         # function. checking if there is selected text on itself will
         # avoid it having ask through X.
         if self.ui.webEngineView.hasSelection():
-            term = self.ui.webEngineView.selectedText()
+            return self.ui.webEngineView.selectedText()
         else:
             try:
-                term = paste(primary=True)
+                return paste(primary=True)
             except TypeError:
                 # In  case there is no primary clipboard
-                term = paste()
+                return paste()
+
+
+    def auto_mode(self):
+        term = self.get_clipboard()
         print(f'searching: {term}')
         self.ui.txtClip.setText(term)
         self.search()
@@ -105,9 +117,11 @@ class myWindow(QtWidgets.QMainWindow):
             self.historyIndex = -1
             self.update_word()
         except requests.exceptions.ConnectionError as e:
-            self.ui.webEngineView.setHtml(f'Connection Error: {e}')
+            self.ui.webEngineView.setHtml(
+                templates.get_error_html('Connection Error',str(e)))
         except requests.exceptions.ConnectTimeout as e:
-            self.ui.webEngineView.setHtml(f'Connection Timeout: {e}')
+            self.ui.webEngineView.setHtml(
+                templates.get_error_html('Connection Timeout',str(e)))
 
     def search_web(self):
         webbrowser.open(f'jisho.org/{self.term}')
@@ -160,14 +174,18 @@ class myWindow(QtWidgets.QMainWindow):
     def update_word(self):
         if not self.term:
             return
-        try:
+        if len(self.meanings) == 0:
+            self.ui.webEngineView.setHtml(templates.get_error_html(
+                'Zero Results',
+                f'We couldn\'t find any words matching <u>{self.term}</u>, please try ' +
+                'to prune out the extra particles at the begining/end of the word and try again.'))
+            self.statusBar().showMessage(f'Zero results for {self.term}.')
+        else:
             wrd = self.meanings[self.position]
             self.statusBar().showMessage(f'{self.position+1} of {len(self.meanings)} search result(s)')
             self.ui.webEngineView.setHtml(templates.get_meanings_html(wrd))
             # with open("/tmp/t.html", "w") as w:
             #     w.write(templates.get_meanings_html(wrd))
-        except (KeyError, IndexError) as e:
-            self.ui.webEngineView.setHtml(f'API error: {e}')
 
 
 def main():
