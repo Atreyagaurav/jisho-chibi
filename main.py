@@ -27,14 +27,40 @@ class myWindow(QtWidgets.QMainWindow):
                                       'For more info on this app visit <a href="https://github.com/atreyagaurav/jisho-chibi">github</a>.</small>')
         self.connect_functions()
         self.term = ''
+        self.meanings = []
+        self.position = -1
         self.history = []
+        self.termHistory = []
+        self.historyIndex = -1
 
     def connect_functions(self):
-        self.ui.btnSearch.clicked.connect(self.search)
+        # input textbox
         self.ui.txtClip.returnPressed.connect(self.search)
+        # would be nice to press ESC to lose focus, but it works if I press TAB to shift focus.
+        # self.ui.txtClip.inputRejected.connect(self.ui.txtClip.clearFocus)
+        # buttons
+        self.ui.btnSearch.clicked.connect(self.search)
         self.ui.btnNext.clicked.connect(self.next)
         self.ui.btnPrev.clicked.connect(self.prev)
         self.ui.toolSync.clicked.connect(self.auto_mode)
+        # menubar
+        self.ui.actionNextResult.triggered.connect(self.next)
+        self.ui.actionPreviousResult.triggered.connect(self.prev)
+        self.ui.actionNextSearch.triggered.connect(self.next_history)
+        self.ui.actionPreviousSearch.triggered.connect(self.prev_history)
+        self.ui.actionClearSearchHistory.triggered.connect(self.clear_history)
+        # keys
+        self.ui.actionNextResult.setShortcuts([
+            QtGui.QKeySequence("n"),
+            QtGui.QKeySequence.MoveToNextChar])
+        self.ui.actionPreviousResult.setShortcuts([
+            QtGui.QKeySequence("p"),
+            QtGui.QKeySequence.MoveToPreviousChar])
+        self.ui.actionNextSearch.setShortcuts([
+            QtGui.QKeySequence.MoveToNextLine])
+        self.ui.actionPreviousSearch.setShortcuts([
+            QtGui.QKeySequence.MoveToPreviousLine])
+        self.ui.actionClearSearchHistory.setShortcut(QtGui.QKeySequence("Del"))
 
     def auto_mode(self):
         try:
@@ -49,10 +75,13 @@ class myWindow(QtWidgets.QMainWindow):
     def search(self):
         self.term = self.ui.txtClip.text()
         self.statusBar().showMessage(f'Searching: {self.term}')
-        self.update()
+        self.app.processEvents()
         try:
             self.meanings = get_meanings_block(self.term)
             self.position = 0
+            self.history.append(self.meanings)
+            self.termHistory.append(self.term)
+            self.historyIndex = -1
             self.update_word()
         except requests.exceptions.ConnectionError as e:
             self.ui.webEngineView.setHtml(f'Connection Error: {e}')
@@ -60,12 +89,46 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.webEngineView.setHtml(f'Connection Timeout: {e}')
 
     def next(self):
+        if len(self.meanings) < 2:
+            self.statusBar().showMessage('No next results.')
+            return
         self.position = (self.position + 1) % len(self.meanings)
         self.update_word()
         
     def prev(self):
+        if len(self.meanings) < 2:
+            self.statusBar().showMessage('No previous results.')
+            return
         self.position = (self.position - 1) % len(self.meanings)
         self.update_word()
+
+    def clear_history(self):
+        # removes all but the current term from history
+        self.history = [self.meanings]
+        self.termHistory = [self.term]
+        self.historyIndex = -1
+
+    def next_history(self):
+        if self.historyIndex < -1:
+            self.historyIndex += 1
+            self.meanings = self.history[self.historyIndex]
+            self.term = self.termHistory[self.historyIndex]
+            self.ui.txtClip.setText(self.term)
+            self.position = 0
+            self.update_word()
+        else:
+            self.statusBar().showMessage('No further search.')
+
+    def prev_history(self):
+        if self.historyIndex > -len(self.history):
+            self.historyIndex -= 1
+            self.meanings = self.history[self.historyIndex]
+            self.term = self.termHistory[self.historyIndex]
+            self.ui.txtClip.setText(self.term)
+            self.position = 0
+            self.update_word()
+        else:
+            self.statusBar().showMessage('No previous search.')
 
     def update_word(self):
         if not self.term:
