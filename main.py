@@ -57,17 +57,25 @@ class myWindow(QtWidgets.QMainWindow):
             QtGui.QKeySequence("p"),
             QtGui.QKeySequence.MoveToPreviousChar])
         self.ui.actionNextSearch.setShortcuts([
-            QtGui.QKeySequence.MoveToNextLine])
+            QtGui.QKeySequence.MoveToNextPage])
         self.ui.actionPreviousSearch.setShortcuts([
-            QtGui.QKeySequence.MoveToPreviousLine])
+            QtGui.QKeySequence.MoveToPreviousPage])
         self.ui.actionClearSearchHistory.setShortcut(QtGui.QKeySequence("Del"))
 
     def auto_mode(self):
-        try:
-            term = paste(primary=True)
-        except TypeError:
-            # In  case there is no primary clipboard
-            term = paste()
+        # to avoid asking the primary selection for itself and being
+        # unable to get it from X since it is busy waiting inside this
+        # function. checking if there is selected text on itself will
+        # avoid it having ask through X.
+        sel = self.ui.webEngineView.selectedText()
+        if sel:
+            term = sel
+        else:
+            try:
+                term = paste(primary=True)
+            except TypeError:
+                # In  case there is no primary clipboard
+                term = paste()
         print(f'searching: {term}')
         self.ui.txtClip.setText(term)
         self.search()
