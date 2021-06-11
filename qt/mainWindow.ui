@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Jisho</string>
+   <string>Jisho Chibi</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -104,8 +104,131 @@
      <height>20</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuJisho">
+    <property name="title">
+     <string>jisho</string>
+    </property>
+    <addaction name="actionSearchInJishoWeb"/>
+    <addaction name="actionNextResult"/>
+    <addaction name="actionPreviousResult"/>
+    <addaction name="actionPreviousSearch"/>
+    <addaction name="actionNextSearch"/>
+    <addaction name="actionHide"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <widget class="QMenu" name="menuClipboard">
+     <property name="title">
+      <string>Clipboard</string>
+     </property>
+     <addaction name="actionPrimarySelection"/>
+     <addaction name="actionClipboard_2"/>
+    </widget>
+    <addaction name="menuClipboard"/>
+    <addaction name="actionClearSearchHistory"/>
+   </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <addaction name="actionGithub"/>
+   </widget>
+   <addaction name="menuJisho"/>
+   <addaction name="menuOptions"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSearchInJishoWeb">
+   <property name="text">
+    <string>Search in Jisho Web</string>
+   </property>
+   <property name="shortcut">
+    <string>W</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Q</string>
+   </property>
+  </action>
+  <action name="actionPrimarySelection">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Primary/Selection</string>
+   </property>
+  </action>
+  <action name="actionClipboard_2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Clipboard</string>
+   </property>
+  </action>
+  <action name="actionPreviousSearch">
+   <property name="text">
+    <string>Previous Search</string>
+   </property>
+   <property name="shortcut">
+    <string>PgUp, Up</string>
+   </property>
+  </action>
+  <action name="actionNextSearch">
+   <property name="text">
+    <string>Next Search</string>
+   </property>
+   <property name="shortcut">
+    <string>PgDown, Down</string>
+   </property>
+  </action>
+  <action name="actionGithub">
+   <property name="text">
+    <string>Github</string>
+   </property>
+  </action>
+  <action name="actionClearSearchHistory">
+   <property name="text">
+    <string>Clear Search History</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="actionHide">
+   <property name="text">
+    <string>Hide</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionNextResult">
+   <property name="text">
+    <string>Next Result</string>
+   </property>
+   <property name="shortcut">
+    <string>Right, N</string>
+   </property>
+  </action>
+  <action name="actionPreviousResult">
+   <property name="text">
+    <string>Previous Result</string>
+   </property>
+   <property name="shortcut">
+    <string>Left, P</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

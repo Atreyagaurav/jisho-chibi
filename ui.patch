@@ -1,0 +1,69 @@
+diff -u /home/gaurav/python/jisho/window1.py /home/gaurav/python/jisho/window.py
+--- /home/gaurav/python/jisho/window1.py	2021-06-11 13:39:27.447134400 +0545
++++ /home/gaurav/python/jisho/window.py	2021-06-11 13:42:38.519607900 +0545
+@@ -10,6 +10,11 @@
+ 
+ from PyQt5 import QtCore, QtGui, QtWidgets
+ 
++import os
++
++def resource(path):
++    return os.path.join(os.path.dirname(__file__), path)
++
+ 
+ class Ui_MainWindow(object):
+     def setupUi(self, MainWindow):
+@@ -23,7 +28,7 @@
+         self.horizontalLayout.setObjectName("horizontalLayout")
+         self.toolSync = QtWidgets.QToolButton(self.centralwidget)
+         icon = QtGui.QIcon()
+-        icon.addPixmap(QtGui.QPixmap(":/icons/auto.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
++        icon.addPixmap(QtGui.QPixmap(resource("./icons/auto.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+         self.toolSync.setIcon(icon)
+         self.toolSync.setObjectName("toolSync")
+         self.horizontalLayout.addWidget(self.toolSync)
+@@ -33,21 +38,21 @@
+         self.btnSearch = QtWidgets.QPushButton(self.centralwidget)
+         self.btnSearch.setText("")
+         icon1 = QtGui.QIcon()
+-        icon1.addPixmap(QtGui.QPixmap(":/icons/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
++        icon1.addPixmap(QtGui.QPixmap(resource("./icons/search.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+         self.btnSearch.setIcon(icon1)
+         self.btnSearch.setObjectName("btnSearch")
+         self.horizontalLayout.addWidget(self.btnSearch)
+         self.btnPrev = QtWidgets.QPushButton(self.centralwidget)
+         self.btnPrev.setText("")
+         icon2 = QtGui.QIcon()
+-        icon2.addPixmap(QtGui.QPixmap("qt/../icons/prev.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
++        icon2.addPixmap(QtGui.QPixmap(resource("./icons/prev.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+         self.btnPrev.setIcon(icon2)
+         self.btnPrev.setObjectName("btnPrev")
+         self.horizontalLayout.addWidget(self.btnPrev)
+         self.btnNext = QtWidgets.QPushButton(self.centralwidget)
+         self.btnNext.setText("")
+         icon3 = QtGui.QIcon()
+-        icon3.addPixmap(QtGui.QPixmap("qt/../icons/next.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
++        icon3.addPixmap(QtGui.QPixmap(resource("./icons/next.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+         self.btnNext.setIcon(icon3)
+         self.btnNext.setObjectName("btnNext")
+         self.horizontalLayout.addWidget(self.btnNext)
+@@ -120,9 +125,9 @@
+         MainWindow.setWindowTitle(_translate("MainWindow", "Jisho Chibi"))
+         self.toolSync.setToolTip(_translate("MainWindow", "Sync with Selection/Clipboard"))
+         self.toolSync.setText(_translate("MainWindow", "..."))
+-        self.btnSearch.setStatusTip(_translate("MainWindow", "Search from Textbar"))
+-        self.btnPrev.setStatusTip(_translate("MainWindow", "Previous Definition"))
+-        self.btnNext.setStatusTip(_translate("MainWindow", "Next Definition"))
++        self.btnSearch.setToolTip(_translate("MainWindow", "Search from Textbar"))
++        self.btnPrev.setToolTip(_translate("MainWindow", "Previous Definition"))
++        self.btnNext.setToolTip(_translate("MainWindow", "Next Definition"))
+         self.menuJisho.setTitle(_translate("MainWindow", "jisho"))
+         self.menuOptions.setTitle(_translate("MainWindow", "Options"))
+         self.menuClipboard.setTitle(_translate("MainWindow", "Clipboard"))
+@@ -143,4 +148,3 @@
+         self.actionHide.setText(_translate("MainWindow", "Hide"))
+         self.actionHide.setShortcut(_translate("MainWindow", "Esc"))
+ from PyQt5 import QtWebEngineWidgets
+-import icons_rc
+
+Diff finished.  Fri Jun 11 13:44:14 2021

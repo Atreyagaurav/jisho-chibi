@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from PyQt5 import QtWidgets, QtCore, QtGui
-from mainWindow import Ui_MainWindow
+from window import Ui_MainWindow
 
 import requests
 import pyperclip as pc
@@ -27,9 +27,11 @@ class myWindow(QtWidgets.QMainWindow):
                                       'For more info on this app visit <a href="https://github.com/atreyagaurav/jisho-chibi">github</a>.</small>')
         self.connect_functions()
         self.term = ''
+        self.history = []
 
     def connect_functions(self):
         self.ui.btnSearch.clicked.connect(self.search)
+        self.ui.txtClip.returnPressed.connect(self.search)
         self.ui.btnNext.clicked.connect(self.next)
         self.ui.btnPrev.clicked.connect(self.prev)
         self.ui.toolSync.clicked.connect(self.auto_mode)
@@ -70,7 +72,7 @@ class myWindow(QtWidgets.QMainWindow):
             return
         try:
             wrd = self.meanings[self.position]["japanese"][0]
-            self.statusBar().showMessage(f'{self.position+1} of {len(self.meanings)} meaning(s)')
+            self.statusBar().showMessage(f'{self.position+1} of {len(self.meanings)} search result(s)')
             html = f'<p>{wrd.get("word")} ({wrd.get("reading")})</p>'
             senses = self.meanings[self.position]["senses"]
             meanings = ["; ".join(sen["english_definitions"]) for sen in senses]
