@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <style>
+       body {
+	   background: #2a2a2a;
+	   color: #F7F8F8;
+       }
+
+       a {
+	   color: #727fff;
+       }
+       
+       a:visited {
+	   color: #f0f
+       }
+      </style>
+  </head>
+  <body>
+    <p>{{word["japanese"][0]["word"]}} ({{word["japanese"][0]["reading"]}})
+      {% if word["japanese"]|length > 1 %}<sup>[alt:{{word["japanese"]|length -1}}]</sup>{% endif %}
+    </p>
+    <small>
+      <ol>
+	{% for sense in word["senses"] %}
+	<li>
+	  {% for def in sense["english_definitions"] %}
+	  {{def}};
+	  {% endfor %}
+	</li>
+	{% endfor %}
+      </ol>
+    </small>
+      {% if word["japanese"]|length > 1 %}
+    <p><small>Other forms:</small>
+      <ul>
+	{% for wrd in word["japanese"][1:] %}
+	<li>{{wrd["word"]}} ({{wrd["reading"]}})</li>
+	{% endfor %}
+      </ul>
+    </p>
+    {% endif %}
+  </body>
+</html>
+

@@ -2,10 +2,12 @@
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from window import Ui_MainWindow
+import page_templates as templates
 
 import requests
 import pyperclip as pc
 import webbrowser
+import qtmodern.styles
 
 _, paste = pc.determine_clipboard()
 
@@ -19,13 +21,12 @@ def get_meanings_block(term):
 class myWindow(QtWidgets.QMainWindow):
     def __init__(self, app):
         self.app = app
+        qtmodern.styles.dark(self.app)
         super(myWindow, self).__init__()
         # self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.webEngineView.setHtml('<small><p>Jisho Chibi GUI for jisho API.</p>' +
-                                      'Visit <a href="https://jisho.org/">jisho page</a> for full dictionary use. <br \>'
-                                      'For more info on this app visit <a href="https://github.com/atreyagaurav/jisho-chibi">github</a>.</small>')
+        self.ui.webEngineView.setHtml(templates.get_intro_html())
         self.connect_functions()
         self.term = ''
         self.meanings = []
@@ -52,7 +53,14 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.actionClearSearchHistory.triggered.connect(self.clear_history)
         self.ui.actionGithub.triggered.connect(self.visit_github)
         self.ui.actionSearchInJishoWeb.triggered.connect(self.search_web)
+        self.ui.actionExit.triggered.connect(self.exit)
         # keys
+        self.ui.toolSync.setShortcut(
+            QtGui.QKeySequence.Refresh
+        )
+        self.ui.actionExit.setShortcut(
+            QtGui.QKeySequence("Q")
+        )
         self.ui.actionNextResult.setShortcuts([
             QtGui.QKeySequence("n"),
             QtGui.QKeySequence.MoveToNextChar])
@@ -65,14 +73,16 @@ class myWindow(QtWidgets.QMainWindow):
             QtGui.QKeySequence.MoveToPreviousPage])
         self.ui.actionClearSearchHistory.setShortcut(QtGui.QKeySequence("Del"))
 
+    def exit(self):
+        self.app.exit(0)
+
     def auto_mode(self):
         # to avoid asking the primary selection for itself and being
         # unable to get it from X since it is busy waiting inside this
         # function. checking if there is selected text on itself will
         # avoid it having ask through X.
-        sel = self.ui.webEngineView.selectedText()
-        if sel:
-            term = sel
+        if self.ui.webEngineView.hasSelection():
+            term = self.ui.webEngineView.selectedText()
         else:
             try:
                 term = paste(primary=True)
@@ -151,16 +161,11 @@ class myWindow(QtWidgets.QMainWindow):
         if not self.term:
             return
         try:
-            wrd = self.meanings[self.position]["japanese"][0]
+            wrd = self.meanings[self.position]
             self.statusBar().showMessage(f'{self.position+1} of {len(self.meanings)} search result(s)')
-            html = f'<p>{wrd.get("word")} ({wrd.get("reading")})</p>'
-            senses = self.meanings[self.position]["senses"]
-            meanings = ["; ".join(sen["english_definitions"]) for sen in senses]
-            html += '<small><ol>'
-            for m in meanings:
-                html += f'<li>{m}</li>'
-            html += '</ol></small>'
-            self.ui.webEngineView.setHtml(html)
+            self.ui.webEngineView.setHtml(templates.get_meanings_html(wrd))
+            # with open("/tmp/t.html", "w") as w:
+            #     w.write(templates.get_meanings_html(wrd))
         except (KeyError, IndexError) as e:
             self.ui.webEngineView.setHtml(f'API error: {e}')
 
