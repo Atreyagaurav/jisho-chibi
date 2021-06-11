@@ -5,6 +5,7 @@ from window import Ui_MainWindow
 
 import requests
 import pyperclip as pc
+import webbrowser
 
 _, paste = pc.determine_clipboard()
 
@@ -49,6 +50,8 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.actionNextSearch.triggered.connect(self.next_history)
         self.ui.actionPreviousSearch.triggered.connect(self.prev_history)
         self.ui.actionClearSearchHistory.triggered.connect(self.clear_history)
+        self.ui.actionGithub.triggered.connect(self.visit_github)
+        self.ui.actionSearchInJishoWeb.triggered.connect(self.search_web)
         # keys
         self.ui.actionNextResult.setShortcuts([
             QtGui.QKeySequence("n"),
@@ -95,6 +98,12 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.webEngineView.setHtml(f'Connection Error: {e}')
         except requests.exceptions.ConnectTimeout as e:
             self.ui.webEngineView.setHtml(f'Connection Timeout: {e}')
+
+    def search_web(self):
+        webbrowser.open(f'jisho.org/{self.term}')
+
+    def visit_github(self):
+        webbrowser.open('https://github.com/Atreyagaurav/jisho-chibi')
 
     def next(self):
         if len(self.meanings) < 2:
