@@ -26,6 +26,12 @@
 	  {% for def in sense["english_definitions"] %}
 	  {{def}};
 	  {% endfor %}
+	  {% if sense["parts_of_speech"]|length > 1 %}
+	  <font color="brown" title='{% for pos in sense["parts_of_speech"] %}{{pos}};{% endfor %}'><sup>POS</sup></font>
+	  {% endif %}
+	  {% if sense["tags"]|length > 1 %}
+	  <font color="gray" title='{% for tag in sense["tags"] %}{{tag}};{% endfor %}'><sup>TAGS</sup></font>
+	  {% endif %}
 	</li>
 	{% endfor %}
       </ol>

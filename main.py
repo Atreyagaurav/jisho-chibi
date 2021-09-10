@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-
+import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
-from window import Ui_MainWindow
+from PyQt5.QtDBus import QDBusConnection, QDBusMessage
+from singleApp import QSingleApplication
+from window import Ui_MainWindow, resource
 import page_templates as templates
 
 import requests
@@ -19,11 +21,12 @@ def get_meanings_block(term):
 
 
 class myWindow(QtWidgets.QMainWindow):
-    def __init__(self, app):
+    def __init__(self, app, toggle_action):
         self.app = app
         qtmodern.styles.dark(self.app)
         super(myWindow, self).__init__()
         # self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.toggle_action = toggle_action
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.webEngineView.setHtml(templates.get_intro_html())
@@ -56,6 +59,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.actionSearchInJishoWeb.triggered.connect(self.search_web)
         self.ui.actionPrimarySelection.triggered.connect(self._clipboard)
         self.ui.actionExit.triggered.connect(self.exit)
+        self.ui.actionHide.triggered.connect(self.hide)
         # keys
         self.ui.toolSync.setShortcut(
             QtGui.QKeySequence.Refresh
@@ -75,6 +79,24 @@ class myWindow(QtWidgets.QMainWindow):
             QtGui.QKeySequence.MoveToPreviousPage])
         self.ui.actionClearSearchHistory.setShortcut(QtGui.QKeySequence("Del"))
 
+    def on_tray_click(self, num):
+        if num == QtWidgets.QSystemTrayIcon.Trigger:
+            self.toggle_display()
+        
+    def toggle_display(self):
+        if self.isVisible():
+            self.hide()
+        else:
+            self.show()
+
+    def show(self):
+        super(myWindow, self).show()
+        self.toggle_action.setText('Hide')
+
+    def hide(self):
+        super(myWindow, self).hide()
+        self.toggle_action.setText('Show')
+
     def exit(self):
         self.app.exit(0)
 
@@ -84,7 +106,7 @@ class myWindow(QtWidgets.QMainWindow):
     def get_clipboard(self):
         if not self.primary:
             return paste()
-        
+
         # to avoid asking the primary selection for itself and being
         # unable to get it from X since it is busy waiting inside this
         # function. checking if there is selected text on itself will
@@ -95,15 +117,26 @@ class myWindow(QtWidgets.QMainWindow):
             try:
                 return paste(primary=True)
             except TypeError:
-                # In  case there is no primary clipboard
+                # In  case there is no primary clipboard, UNTESTED
+                self.ui.actionPrimarySelection.setDisabled(True)
+                self.primary = False
                 return paste()
 
 
     def auto_mode(self):
         term = self.get_clipboard()
         print(f'searching: {term}')
-        self.ui.txtClip.setText(term)
-        self.search()
+        self._search(term)
+
+    def _search(self, term):
+        if term:
+            self.ui.txtClip.setText(term)
+            self.search()
+        else:
+            self.ui.webEngineView.setHtml(templates.get_error_html(
+                'Empty Search String',
+                'Cannot perform empty search.'))
+            self.show()
 
     def search(self):
         self.term = self.ui.txtClip.text()
@@ -124,7 +157,7 @@ class myWindow(QtWidgets.QMainWindow):
                 templates.get_error_html('Connection Timeout',str(e)))
 
     def search_web(self):
-        webbrowser.open(f'jisho.org/{self.term}')
+        webbrowser.open(f'jisho.org/search/{self.term}')
 
     def visit_github(self):
         webbrowser.open('https://github.com/Atreyagaurav/jisho-chibi')
@@ -188,12 +221,41 @@ class myWindow(QtWidgets.QMainWindow):
             #     w.write(templates.get_meanings_html(wrd))
 
 
+class QDBhandler(QtCore.QObject):
+    def __init__(self, win):
+        super(QDBhandler, self).__init__()
+        bus = QDBusConnection.systemBus()
+        bus.registerObject('/', self)
+        bus.connect('', '/', 'gaurav.jisho', 'search', self.dmsg)
+        self.win = win
+
+    @QtCore.pyqtSlot(QDBusMessage)
+    def dmsg(self, message):
+        if not self.win.isVisible():
+            self.win.show()
+        self.win._search(message.arguments()[0])
+            
+
 def main():
     app = QtWidgets.QApplication([])
-    win = myWindow(app)
+    icon = QtWidgets.QSystemTrayIcon(
+        QtGui.QIcon(resource('./icons/icon.png')))
+    menu = QtWidgets.QMenu()
+    display_toggle = menu.addAction('Show')
+    win = myWindow(app, display_toggle)
+    handler = QDBhandler(win)
+    display_toggle.triggered.connect(win.toggle_display)
+    menu.addAction('Exit').triggered.connect(win.exit)
+
+    icon.setContextMenu(menu)
+    icon.activated.connect(win.on_tray_click)
+    icon.show()
     win.show()
-    app.exec_()
+    sys.exit(app.exec())
 
         
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 1:
+        main()
+    else:
+        pass
