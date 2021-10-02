@@ -4,7 +4,7 @@
 
    This app is based on the Jisho API provided in this [[https://jisho.org/forum/54fefc1f6e73340b1f160000-is-there-any-kind-of-search-api][forum post]].
 
-   The GUI is a qt web engine, but instead of browsing the jisho website, it makes a small html in the following format to show the meanings.
+   The GUI is a qt web engine, but instead of browsing the jisho website, it makes a small html page to show the meanings. It stated from something as simple as this:
 
    #+begin_src html
    <p> JP-WORD (JP-FURIGANA)</p>
@@ -15,7 +15,14 @@
 
    The en-meanings part can contain multiple meanings, and for multiple entries (search results), you can use the buttons on the top to navigate.
 
+   But Now there is a bit more of other things added to the minimal page, but you can change that in the HTML template in the template folder if you think there is a need to include something more, or change the way some information is included in the output.
+
+** Usage
+   There are buttons on the top which can be used to search and navigate. The first button on the left is there to automatically search from Primary selection (Linux), you can also configure it to search from the Clipboard (Not tested in Windows).
+   
 ** Screenshots
+   NOTE: There is some additions to the UI, so these screenshots are from older versions. I am planning to improve it further. 
+   
    Screenshot in context (using it while translating.)
    
    [[./screenshots/screenshot-1.png]]
@@ -32,3 +39,9 @@
    
    [[./screenshots/screenshot-5.png]]
    
+** Contributing
+   If you want to help I would like help in some areas.
+   - Verify it works on windows.
+   - Make the template for both dark and light modes.
+   - Auto sync mode for reading.
+     
