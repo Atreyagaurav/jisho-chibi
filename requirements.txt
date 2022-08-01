@@ -1,5 +1,4 @@
 requests
-webbrowser
 pyperclip
 PyQt5
 qtmodern

@@ -2,7 +2,6 @@
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtDBus import QDBusConnection, QDBusMessage
-from singleApp import QSingleApplication
 from window import Ui_MainWindow, resource
 import page_templates as templates
 
@@ -122,7 +121,6 @@ class myWindow(QtWidgets.QMainWindow):
                 self.primary = False
                 return paste()
 
-
     def auto_mode(self):
         term = self.get_clipboard()
         print(f'searching: {term}')
@@ -234,7 +232,7 @@ class QDBhandler(QtCore.QObject):
         if not self.win.isVisible():
             self.win.show()
         self.win._search(message.arguments()[0])
-            
+
 
 def main():
     app = QtWidgets.QApplication([])
